@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lecture 19 · Models, Loading &amp; Error States</title>
+  <meta name="description" content="Mobile App Development with Flutter, Lecture 19: Turn JSON into Dart model classes, keep network code in a service class, show loading, success, empty and error states with retry, and practise with free APIs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Sora:wght@600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="flutter-logo" viewBox="0 0 166 210">
+    <path fill="#44D1FD" d="M10 101 100 11h56L38 129z"/>
+    <path fill="#1FBCFD" d="M51 150 100 102h56l-77 76z"/>
+    <path fill="#08589C" d="M79 178 107 150l49 49h-56z"/>
+  </symbol>
+  <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 3v12"/><path d="M18 9a9 9 0 0 1-9 9"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><path d="M12 15V3"/></symbol>
+  <symbol id="i-windows" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9"/><path d="M2 19.5 4 16h16l2 3.5a1 1 0 0 1-.9 1.5H2.9a1 1 0 0 1-.9-1.5z"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+  <symbol id="i-disk" viewBox="0 0 24 24"><path d="M22 12H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/><path d="M6 16h.01M10 16h.01"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.6a11 11 0 0 1 14 0"/><path d="M1.4 9a16 16 0 0 1 21.2 0"/><path d="M8.5 16.1a6 6 0 0 1 7 0"/><path d="M12 20h.01"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="m7.5 4.3 9 5.1"/><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><path d="M12 19h8"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-mouse" viewBox="0 0 24 24"><path d="m4 4 7 17 2.5-7.5L21 11z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-chrome" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.2 8H12M3.9 6.1 8.5 14M10.9 21.9l4.6-7.9"/></symbol>
+  <symbol id="i-cable" viewBox="0 0 24 24"><path d="M17 21v-2a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1v2"/><path d="M19 15V6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 0 1-7 0V9"/><path d="M3 9V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4z"/></symbol>
+  <symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 7c-1.5-1.3-4.5-1.6-6 .5-1.6 2.3-1 6.6 1.3 9.9 1 1.4 2 2.6 3.2 2.5.9 0 1.2-.6 1.5-.6s.6.6 1.5.6c1.2.1 2.2-1.1 3.2-2.5 2.3-3.3 2.9-7.6 1.3-9.9-1.5-2.1-4.5-1.8-6-.5z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 2.8-2.2 4-4 4h-2a2 2 0 0 0-1.5 3.3c.5.6.3 1.7-.5 2.2-.6.3-1.3.5-2 .5z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="10.5" r="1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 5.2-2.7"/><path d="M19 12.9a10 10 0 0 0-2-1.5"/><path d="M2 8.8a15 15 0 0 1 4.2-2.6"/><path d="M22 8.8a15 15 0 0 0-11.3-3.8"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.7-2.7L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></symbol>
+  <symbol id="i-braces" viewBox="0 0 24 24"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.3-.8-2-2-2H4c-1.3 0-2 .8-2 2v6c0 1.3.8 2 2 2h1c0 2.5-1 4-2 4z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.3-.8-2-2-2h-4c-1.3 0-2 .8-2 2v6c0 1.3.8 2 2 2h1c0 2.5-1 4-2 4z"/></symbol>
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></symbol>
+  <symbol id="i-loader" viewBox="0 0 24 24"><path d="M12 2v4M16.2 7.8l2.9-2.9M18 12h4M16.2 16.2l2.9 2.9M12 18v4M4.9 19.1l2.9-2.9M2 12h4M4.9 4.9l2.9 2.9"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+</svg>
+
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<main class="deck">
+
+<!-- 01 · Title -->
+<section class="slide">
+  <div class="canvas"><div class="frame frame--title">
+    <div class="stagger">
+      <p class="kicker">Lecture 19 · Mobile App Development</p>
+      <h1 class="hero" style="font-size:3.7cqw;">APIs 2: Models,<br><span class="grad-text">Loading &amp; Error States</span>,<br>Practice APIs</h1>
+      <p class="lead lead--hero">From raw JSON to a real shop screen.</p>
+      <div class="chips">
+        <span class="chip"><span class="avatar">MI</span>Eng. Monther Ibrahim</span>
+        <span class="chip"><span class="avatar">M</span>Muhammad, M.Sc.</span>
+        <span class="chip">Fall 2026</span>
+      </div>
+      <p class="keys"><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>F</kbd> fullscreen &nbsp;·&nbsp; <kbd>N</kbd> notes &nbsp;·&nbsp; <kbd>T</kbd> theme</p>
+    </div>
+    <div class="title-right" aria-hidden="true" style="display:flex; align-items:center; justify-content:center; gap:1.1cqw;">
+      <div class="logo-glow" style="left:12%; top:10%;"></div>
+      <div class="ph ph--teal" style="--pw:10.3cqw; margin-top:-7cqw;">
+        <div class="ph__scr"><div class="ph__island"></div>
+          <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+          <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A;"></span><div><b>Essence Mascara Lash Princess</b><small>$9.99</small></div></div>
+          <div class="ptile"><span class="pimg pimg--pan" style="--bgc:#EFEBE9;"></span><div><b>Eyeshadow Palette with Mirror</b><small>$19.99</small></div></div>
+          <div class="ptile"><span class="pimg pimg--jar" style="--bgc:#FFF3E0; --ink:#E8B98F; --cap:#6D4C41;"></span><div><b>Powder Canister</b><small>$14.99</small></div></div>
+          <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FFEBEE; --ink:#C9A227; --cap:#C62828;"></span><div><b>Red Lipstick</b><small>$12.99</small></div></div>
+          <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#FFEBEE; --ink:#D32F2F; --cap:#212121;"></span><div><b>Red Nail Polish</b><small>$8.99</small></div></div>
+          <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#ECEFF1; --ink:#B0BEC5; --cap:#37474F;"></span><div><b>Calvin Klein CK One</b><small>$49.99</small></div></div>
+        </div>
+      </div>
+      <div class="ph ph--teal" style="--pw:10.3cqw; margin-top:1cqw;">
+        <div class="ph__scr"><div class="ph__island"></div>
+          <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Essence Mascara Lash Princess</span></div>
+          <div class="col" style="gap:.5em; padding-top:.5em;">
+            <span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A; width:7.5em; height:7.5em; align-self:center;"></span>
+            <div style="font-size:1.25em; line-height:1.2;">Essence Mascara Lash Princess</div>
+            <div style="font-size:1.1em; font-weight:700; color:#006A60;">$9.99</div>
+            <div class="rowx" style="font-size:.85em;"><svg class="ico ico-m" style="--ic:#FFC107; fill:#FFC107;"><use href="#i-star"/></svg><span>2.6</span><span style="margin-left:.8em;">Essence</span></div>
+            <div style="font-size:.78em; line-height:1.4; color:#3F4947;">The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ph ph--teal" style="--pw:10.3cqw; margin-top:9cqw;">
+        <div class="ph__scr"><div class="ph__island"></div>
+          <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+          <div class="pbody"><div class="state">
+            <svg class="ico ico-m"><use href="#i-wifi-off"/></svg>
+            <span>No internet connection. Check your Wi-Fi or data.</span>
+            <span class="m-btn m-btn--elev">Try again</span>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <aside class="notes"><p>Last time we showed posts straight from maps. Today we build what real apps do: typed data, a clean service, and a screen that behaves well when the internet doesn't.</p></aside>
+</section>
+
+<!-- 02 · Learning objectives -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Today</p>
+      <h2 class="title">Learning objectives</h2>
+    </header>
+    <div class="body" style="grid-template-rows: 1fr auto;">
+      <div class="journey stagger" style="align-items:start;">
+        <div class="stop"><div class="stop__dot"><svg class="ico"><use href="#i-braces"/></svg><span class="stop__n">1</span></div><h3>Models</h3><p>Turn JSON into Dart objects with a model class and <code>fromJson</code></p></div>
+        <div class="stop"><div class="stop__dot"><svg class="ico"><use href="#i-server"/></svg><span class="stop__n">2</span></div><h3>Service</h3><p>Keep network code in a service class</p></div>
+        <div class="stop"><div class="stop__dot"><svg class="ico"><use href="#i-layers"/></svg><span class="stop__n">3</span></div><h3>Four states</h3><p>Show loading, success, empty and error (with retry), with <code>FutureBuilder</code> and with Provider</p></div>
+        <div class="stop"><div class="stop__dot"><svg class="ico"><use href="#i-refresh"/></svg><span class="stop__n">4</span></div><h3>Real-app touches</h3><p>Pull-to-refresh, a details screen, friendly "no internet" messages</p></div>
+        <div class="stop"><div class="stop__dot"><svg class="ico"><use href="#i-send"/></svg><span class="stop__n">5</span></div><h3>POST &amp; practice</h3><p>Send a POST, and practise with free APIs</p></div>
+      </div>
+      <div class="callout callout--ok goal"><svg class="ico"><use href="#i-bag"/></svg><div><b>Live demo:</b> a small <b>shop</b>: products from DummyJSON (image, title, price), a details screen, a spinner, an "empty" message, a friendly error with <b>Try again</b>, and pull-to-refresh.</div></div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Read the goals aloud. We tick them off on the summary slide.</p></aside>
+</section>
+
+<!-- 03 · Why not maps -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">The problem</p>
+      <h2 class="title">Why not just use maps?</h2>
+      <p class="lead">A <b>model class</b> describes one thing from the API (a product, a post) with real Dart types.</p>
+    </header>
+    <div class="body" style="grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 2.6cqw 2.4cqw; align-content:start; padding-top:.6cqw;">
+      <div class="side" style="gap:.9cqw;">
+        <span class="badge badge--warm" style="justify-self:start;"><svg class="ico"><use href="#i-x"/></svg>Map · crashes when it runs</span>
+        <div class="term">
+          <div class="term__bar"><i></i><i></i><i></i><span>posts_page.dart</span></div>
+<pre style="font-size:2.1cqw; padding:1.5cqw 1.8cqw 1.1cqw;"><span class="tk-type">Text</span>(<span class="tk-var">post</span>[<span class="tk-str">'titel'</span>])</pre>
+          <div class="toast toast--ok" style="margin:0 1.2cqw .9cqw; font-size:1.3cqw; padding:1cqw 1.2cqw;"><svg class="ico"><use href="#i-check-circle"/></svg><span>No warning in VS Code. The app runs, then crashes:</span></div>
+<pre style="font-size:1.45cqw; padding:.3cqw 1.8cqw 1.4cqw;"><span class="t-bad">type 'Null' is not a subtype of type 'String'</span></pre>
+        </div>
+      </div>
+      <div class="side" style="gap:.9cqw;">
+        <span class="badge badge--ok" style="justify-self:start;"><svg class="ico"><use href="#i-check"/></svg>Model · caught in the editor</span>
+        <div class="term">
+          <div class="term__bar"><i></i><i></i><i></i><span>products_page.dart</span></div>
+<pre style="font-size:2.1cqw; padding:1.5cqw 1.8cqw 1.1cqw;"><span class="tk-type">Text</span>(<span class="tk-var">product</span>.<span class="tk-prop squig">titel</span>)</pre>
+          <div class="toast" style="margin:0 1.2cqw 1.2cqw; font-size:1.3cqw; padding:1cqw 1.2cqw;"><svg class="ico" style="color:#F14C4C;"><use href="#i-x-circle"/></svg><span>Red underline at once: The getter 'titel' isn't defined for the type 'Product'.</span></div>
+        </div>
+      </div>
+      <div class="stagger" style="grid-column: 1 / -1; display:grid; grid-template-columns: repeat(3, 1fr); gap:1.4cqw;">
+        <div class="callout callout--info" style="font-size:1.45cqw; padding:1.3cqw 1.5cqw;"><svg class="ico"><use href="#i-zap"/></svg><div><b>Autocomplete:</b> type <code>product.</code> and VS Code lists <code>title</code>, <code>price</code>, …</div></div>
+        <div class="callout callout--info" style="font-size:1.45cqw; padding:1.3cqw 1.5cqw;"><svg class="ico"><use href="#i-shield"/></svg><div><b>Type safety:</b> <code>price</code> is a <code>double</code>, not "something dynamic".</div></div>
+        <div class="callout callout--info" style="font-size:1.45cqw; padding:1.3cqw 1.5cqw;"><svg class="ico"><use href="#i-target"/></svg><div><b>One place:</b> the JSON keys are written once, in <code>fromJson</code>.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Open the Lecture 18 Posts page and change <code>post['title']</code> to <code>post['titel']</code>: no warning, then a red screen at runtime. Then type <code>product.</code> in today's code and show the autocomplete list.</p></aside>
+</section>
+
+<!-- 04 · A model class -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Models · 1 of 2</p>
+      <h2 class="title">A model class</h2>
+    </header>
+    <div class="body walk">
+      <div class="term code code--lg">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/models/product.dart</span></div>
+<pre class="hl" data-groups="10-13:g1;7,14:g2">class Product {
+  const Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.thumbnail,
+    this.brand,
+  });
+
+  final int id;
+  final String title;
+  final double price;
+  final String thumbnail;
+  final String? brand; // some products have no brand
+  // ... plus description and rating, the same way
+}</pre>
+      </div>
+      <div class="explain">
+        <div class="legend-groups stagger">
+          <div class="lg" style="--c:#13B9FD;"><span class="n">1</span><b><code>final</code> fields</b><span>A product from the server does not change on the phone.</span></div>
+          <div class="lg" style="--c:#FFC857;"><span class="n">2</span><b><code>String?</code> brand</b><span>92 of DummyJSON's 194 products have <strong>no</strong> <code>brand</code> key (product 16, "Apple", for example).</span></div>
+        </div>
+        <div class="term code code--sm code--nonum">
+          <div class="term__bar"><i></i><i></i><i></i><span>dummyjson.com/products/1</span><span class="grow"></span><span>trimmed</span></div>
+<pre class="hl">{
+  "id": 1,
+  "title": "Essence Mascara Lash Princess",
+  "price": 9.99,
+  "thumbnail": "https://cdn.dummyjson.com/...",
+  "brand": "Essence",
+  ...
+}</pre>
+        </div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-bulb"/></svg><div>The API sends many more keys. A model only keeps what the app shows.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Open <code>https://dummyjson.com/products/1</code> in the browser and pick the keys we need. There are many more (<code>reviews</code>, <code>dimensions</code>, …); a model only keeps what the app shows. The full class with <code>description</code> and <code>rating</code> is in the complete example.</p></aside>
+</section>
+
+<!-- 05 · fromJson -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Models · 2 of 2</p>
+      <h2 class="title"><code>fromJson</code>: one map → one object</h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.25fr .75fr;">
+      <div class="term code code--lg">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/models/product.dart</span><span class="grow"></span><span>inside class Product</span></div>
+<pre class="hl" data-hl="1,6-7,13-14">factory Product.fromJson(Map&lt;String, dynamic&gt; json) {
+  return Product(
+    id: json['id'] as int,
+    title: json['title'] as String,
+    description: json['description'] as String,
+    price: (json['price'] as num).toDouble(),
+    rating: (json['rating'] as num).toDouble(),
+    thumbnail: json['thumbnail'] as String,
+    brand: json['brand'] as String?,
+  );
+}
+
+// The pattern for a whole JSON list → List&lt;Product&gt;:
+(json as List).map((item) =&gt; Product.fromJson(item)).toList()</pre>
+      </div>
+      <div class="explain stagger">
+        <div class="defs">
+          <div class="def"><code>factory</code><span>A constructor that runs code first, then returns an object.</span></div>
+          <div class="def"><code>num</code><span>JSON writes <code>10</code> or <code>9.99</code>; Dart reads <code>int</code> or <code>double</code>. <code>as num</code> accepts both, <code>.toDouble()</code> makes it a <code>double</code>.</span></div>
+          <div class="def"><code>.map(...)</code><span>Turns every map into a <code>Product</code>; <code>.toList()</code> makes it a <code>List</code>.</span></div>
+        </div>
+        <div class="callout callout--warn"><svg class="ico"><use href="#i-alert"/></svg><div>Recipe 11 at DummyJSON has <code>"rating": 5</code>. <code>as double</code> crashes there; <code>as num</code> works.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Real example: recipe 11 at DummyJSON ("Chicken Biryani") has <code>"rating": 5</code>, a whole number. <code>json['rating'] as double</code> crashes there with "type 'int' is not a subtype of type 'double' in type cast"; <code>(json['rating'] as num).toDouble()</code> works for all of them.</p></aside>
+</section>
+
+<!-- 06 · ProductApi -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Service</p>
+      <h2 class="title">A service class: <code>ProductApi</code></h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.35fr .65fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/services/product_api.dart</span><span class="grow"></span><span>first version</span></div>
+<pre class="hl" data-hl="4,7-9,11-13">class ProductApi {
+  static const String _url = 'https://dummyjson.com/products';
+
+  static Future&lt;List&lt;Product&gt;&gt; fetchProducts() async {
+    final response = await http.get(Uri.parse(_url));
+
+    if (response.statusCode != 200) {
+      throw ApiException('Server error (${response.statusCode}). Try later.');
+    }
+
+    final data = jsonDecode(response.body) as Map&lt;String, dynamic&gt;;
+    final productsJson = data['products'] as List;
+    return productsJson.map((item) =&gt; Product.fromJson(item)).toList();
+  }
+}</pre>
+      </div>
+      <div class="explain stagger">
+        <div class="term code code--sm code--nonum">
+          <div class="term__bar"><i></i><i></i><i></i><span>DummyJSON answers</span></div>
+<pre class="hl">{
+  "products": [ ... ],
+  "total": 194,
+  "skip": 0,
+  "limit": 30
+}</pre>
+        </div>
+        <div class="say"><p>A <b>map</b>, with the list inside <code>"products"</code>.</p></div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-zap"/></svg><div><b><code>static</code>:</b> call it without creating an object: <code>ProductApi.fetchProducts()</code>.</div></div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-alert"/></svg><div><b><code>ApiException</code>:</b> our own small error class with a message for the user (complete example).</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>This is the first version; slide 13 adds timeouts and "no internet". Pages should only ask "give me products"; <i>how</i> to get them lives here. If the API changes, we fix one file.</p></aside>
+</section>
+
+<!-- 07 · Four states -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Four states</p>
+      <h2 class="title">The four states of a screen</h2>
+    </header>
+    <div class="body" style="grid-template-rows: 1fr auto; gap:1.4cqw;">
+      <div class="phones stagger" style="gap:3.2cqw;">
+        <div class="ph-col">
+          <span class="badge">1 · Loading</span>
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="pbody"><div class="spin"></div></div>
+            </div>
+          </div>
+          <p class="ph-cap">a spinner in the middle</p>
+        </div>
+        <div class="ph-col">
+          <span class="badge badge--ok">2 · Success</span>
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A;"></span><div><b>Essence Mascara Lash Princess</b><small>$9.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--pan" style="--bgc:#EFEBE9;"></span><div><b>Eyeshadow Palette with Mirror</b><small>$19.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--jar" style="--bgc:#FFF3E0; --ink:#E8B98F; --cap:#6D4C41;"></span><div><b>Powder Canister</b><small>$14.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FFEBEE; --ink:#C9A227; --cap:#C62828;"></span><div><b>Red Lipstick</b><small>$12.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#FFEBEE; --ink:#D32F2F; --cap:#212121;"></span><div><b>Red Nail Polish</b><small>$8.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#ECEFF1; --ink:#B0BEC5; --cap:#37474F;"></span><div><b>Calvin Klein CK One</b><small>$49.99</small></div></div>
+            </div>
+          </div>
+          <p class="ph-cap">the product list</p>
+        </div>
+        <div class="ph-col">
+          <span class="badge badge--warm">3 · Empty</span>
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="pbody"><div class="state">
+                <svg class="ico ico-m"><use href="#i-inbox"/></svg>
+                <span>No products found</span>
+                <span class="m-btn m-btn--text" style="margin-top:-.5em;">Reload</span>
+              </div></div>
+            </div>
+          </div>
+          <p class="ph-cap"><b>Reload</b> button</p>
+        </div>
+        <div class="ph-col">
+          <span class="badge badge--warm">4 · Error</span>
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="pbody"><div class="state">
+                <svg class="ico ico-m"><use href="#i-wifi-off"/></svg>
+                <span>No internet connection. Check your Wi-Fi or data.</span>
+                <span class="m-btn m-btn--elev">Try again</span>
+              </div></div>
+            </div>
+          </div>
+          <p class="ph-cap"><b>Try again</b> button</p>
+        </div>
+      </div>
+      <div class="row-bottom">
+        <div class="callout callout--info" style="font-size:1.3cqw;"><svg class="ico"><use href="#i-layers"/></svg><div>Every screen that loads data needs <b>all four</b>.</div></div>
+        <div class="callout callout--ok" style="font-size:1.3cqw;"><svg class="ico"><use href="#i-check-circle"/></svg><div>Check them in this order: <b>loading → error → empty → success</b>.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Ask: what does a white screen tell the user? Nothing. Is it loading, broken, or empty? Each state answers that question. We show them live by changing the URL: <code>?delay=3000</code> (slow), <code>/products/search?q=zzzz</code> (empty), <code>/productz</code> (error 404).</p></aside>
+</section>
+
+<!-- 08 · Version 1: start and retry -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Version 1 · FutureBuilder</p>
+      <h2 class="title">Version 1 with <code>FutureBuilder</code>: start and retry</h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.3fr .7fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/pages/products_page.dart</span></div>
+<pre class="hl" data-hl="2,7,10-14">class _ProductsPageState extends State&lt;ProductsPage&gt; {
+  late Future&lt;List&lt;Product&gt;&gt; _productsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = ProductApi.fetchProducts();
+  }
+
+  void _retry() {
+    setState(() {
+      _productsFuture = ProductApi.fetchProducts(); // start a new request
+    });
+  }</pre>
+      </div>
+      <div class="explain stagger">
+        <div class="say"><p>No <code>final</code> this time: <b>retry</b> replaces the Future with a new one.</p></div>
+        <div class="phones" style="gap:1cqw; align-items:center;">
+          <div class="ph-col">
+          <div class="ph ph--teal" style="--pw:11cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="pbody"><div class="state">
+                <svg class="ico ico-m"><use href="#i-wifi-off"/></svg>
+                <span>No internet connection. Check your Wi-Fi or data.</span>
+                <span class="m-btn m-btn--elev hot">Try again</span>
+              </div></div>
+            </div>
+          </div>
+          <p class="ph-cap">tap <b>Try again</b> → <code>_retry()</code></p>
+          </div>
+          <div class="arrow-mid" style="margin-bottom:2.4cqw;"><svg class="ico"><use href="#i-arrow-right"/></svg></div>
+          <div class="ph-col">
+          <div class="ph ph--teal" style="--pw:11cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="pbody"><div class="spin"></div></div>
+            </div>
+          </div>
+          <p class="ph-cap">the spinner again</p>
+          </div>
+        </div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-refresh"/></svg><div>A new Future → <code>FutureBuilder</code> starts again at <code>waiting</code> → the spinner shows.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Same idea as Lecture 18 (start the Future in <code>initState</code>, never in <code>build</code>), plus one method to start again.</p></aside>
+</section>
+
+<!-- 09 · Version 1: the builder -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Version 1 · FutureBuilder</p>
+      <h2 class="title">Version 1: the four states in the builder</h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.2fr .8fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>products_page.dart</span><span class="grow"></span><span>inside builder: (context, snapshot) { ... }</span></div>
+<pre class="hl" data-groups="1-3:g1;4-6:g2;7-10:g4;11-16:g3">if (snapshot.connectionState == ConnectionState.waiting) {
+  return const Center(child: CircularProgressIndicator());
+}
+if (snapshot.hasError) {
+  return ErrorView(message: '${snapshot.error}', onRetry: _retry);
+}
+final products = snapshot.data ?? [];
+if (products.isEmpty) {
+  return EmptyView(message: 'No products found', onRetry: _retry);
+}
+return ListView.builder(
+  itemCount: products.length,
+  itemBuilder: (context, index) {
+    return ProductTile(product: products[index]);
+  },
+);</pre>
+      </div>
+      <div class="explain">
+        <div class="legend-groups stagger">
+          <div class="lg" style="--c:#13B9FD;"><span class="n">1</span><b>Loading: a spinner</b></div>
+          <div class="lg" style="--c:#FFC857;"><span class="n">2</span><b>Error: <code>ErrorView</code> + Try again</b></div>
+          <div class="lg" style="--c:#C792EA;"><span class="n">3</span><b>Empty: <code>EmptyView</code> + Reload</b></div>
+          <div class="lg" style="--c:#4ADE80;"><span class="n">4</span><b>Success: the list of tiles</b></div>
+        </div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-package"/></svg><div><code>ErrorView</code> and <code>EmptyView</code>: two small widgets of ours (<code>lib/widgets/status_views.dart</code>), with the <code>AppButton</code> from Lecture 8.</div></div>
+        <div class="callout callout--ok"><svg class="ico"><use href="#i-check-circle"/></svg><div><code>snapshot.data</code> is now a <code>List&lt;Product&gt;</code>, not maps.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p><code>snapshot.error</code> is our <code>ApiException</code>, so <code>'${snapshot.error}'</code> is already a friendly sentence. <code>?? []</code> means "if there is no data, use an empty list".</p></aside>
+</section>
+
+<!-- 10 · Product tile + details -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Details screen</p>
+      <h2 class="title">The product tile and the details screen</h2>
+    </header>
+    <div class="body" style="grid-template-columns: 1fr auto; gap: 2.4cqw; align-items:start;">
+      <div class="side">
+        <div class="term code">
+          <div class="term__bar"><i></i><i></i><i></i><span>lib/widgets/product_tile.dart</span><span class="grow"></span><span>ProductTile · build()</span></div>
+<pre class="hl" data-hl="2-4,9">return ListTile(
+  leading: Image.network(product.thumbnail, width: 56, height: 56),
+  title: Text(product.title),
+  subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =&gt; ProductDetailsPage(product: product),
+      ),
+    );
+  },
+);</pre>
+        </div>
+        <div class="stagger" style="display:grid; grid-template-columns: 1fr 1fr; gap:1.2cqw;">
+          <div class="callout callout--ok"><svg class="ico"><use href="#i-check-circle"/></svg><div>We pass the <b>whole <code>Product</code></b> to the next screen: no keys, no maps.</div></div>
+          <div class="callout callout--info"><svg class="ico"><use href="#i-info"/></svg><div><code>toStringAsFixed(2)</code>: <code>9.99</code> → <code>"9.99"</code>, <code>5</code> → <code>"5.00"</code>; <code>\$</code> prints a real <code>$</code> sign.</div></div>
+        </div>
+      </div>
+      <div class="phones" style="gap:1cqw; align-items:center;">
+        <div class="ph-col">
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products</span></div>
+              <div class="ptile is-tag" data-tag="ProductTile" style="margin:.6em .3em .2em; background:rgba(0,106,96,.08);"><span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A;"></span><div><b>Essence Mascara Lash Princess</b><small>$9.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--pan" style="--bgc:#EFEBE9;"></span><div><b>Eyeshadow Palette with Mirror</b><small>$19.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--jar" style="--bgc:#FFF3E0; --ink:#E8B98F; --cap:#6D4C41;"></span><div><b>Powder Canister</b><small>$14.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FFEBEE; --ink:#C9A227; --cap:#C62828;"></span><div><b>Red Lipstick</b><small>$12.99</small></div></div>
+              <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#FFEBEE; --ink:#D32F2F; --cap:#212121;"></span><div><b>Red Nail Polish</b><small>$8.99</small></div></div>
+            </div>
+          </div>
+          <p class="ph-cap">tap a tile</p>
+        </div>
+        <div class="arrow-mid" style="margin-bottom:2.2cqw;"><svg class="ico"><use href="#i-arrow-right"/></svg></div>
+        <div class="ph-col">
+          <div class="ph ph--teal" style="--pw:12.4cqw;">
+            <div class="ph__scr"><div class="ph__island"></div>
+              <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Essence Mascara Lash Princess</span></div>
+              <div class="col" style="gap:.5em; padding-top:.5em;">
+                <span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A; width:7.5em; height:7.5em; align-self:center;"></span>
+                <div style="font-size:1.25em; line-height:1.2;">Essence Mascara Lash Princess</div>
+                <div style="font-size:1.1em; font-weight:700; color:#006A60;">$9.99</div>
+                <div class="rowx" style="font-size:.85em;"><svg class="ico ico-m" style="--ic:#FFC107; fill:#FFC107;"><use href="#i-star"/></svg><span>2.6</span><span style="margin-left:.8em;">Essence</span></div>
+                <div style="font-size:.78em; line-height:1.4; color:#3F4947;">The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.</div>
+              </div>
+            </div>
+          </div>
+          <p class="ph-cap"><code>ProductDetailsPage</code></p>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p><code>Image.network</code> is from Lecture 6; DummyJSON images are <code>.webp</code>, which Flutter shows on every platform. <code>ProductDetailsPage({required this.product})</code> is the Lecture 9 "pass data through the constructor" pattern.</p><p>The details page shows a big image, the title, the price, the star rating, the brand (or "No brand") and the description.</p></aside>
+</section>
+
+<!-- 11 · ProductsProvider -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Version 2 · Provider</p>
+      <h2 class="title">Version 2 with Provider: <code>ProductsProvider</code></h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.15fr .85fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/providers/products_provider.dart</span></div>
+<pre class="hl" data-groups="4,13:g1;6-10:g2">Future&lt;void&gt; loadProducts() async {
+  _isLoading = true;
+  _error = null;
+  notifyListeners(); // show the spinner
+
+  try {
+    _products = await ProductApi.fetchProducts();
+  } catch (e) {
+    _error = e.toString(); // our friendly ApiException message
+  }
+
+  _isLoading = false;
+  notifyListeners(); // show the list, or the error
+}</pre>
+      </div>
+      <div class="explain stagger">
+        <div class="say"><p>Three private fields + getters: <code>products</code>, <code>isLoading</code>, <code>error</code>.</p></div>
+        <div class="legend-groups">
+          <div class="lg" style="--c:#13B9FD;"><span class="n">1</span><b><code>notifyListeners()</code></b><span>Change the fields, then call it: the page rebuilds.</span></div>
+          <div class="lg" style="--c:#FFC857;"><span class="n">2</span><b><code>try</code> / <code>catch</code></b><span>If the code in <code>try</code> throws, run <code>catch</code> instead of crashing.</span></div>
+        </div>
+        <div class="term code code--sm code--nonum">
+          <div class="term__bar"><i></i><i></i><i></i><span>lib/main.dart</span><span class="grow"></span><span>ChangeNotifierProvider</span></div>
+<pre class="hl">create: (context) =&gt; ProductsProvider()..loadProducts(),</pre>
+        </div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-info"/></svg><div>The <code>..</code> means "create it, call <code>loadProducts()</code>, and give back the provider".</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>This is the <code>ChangeNotifier</code> from Lectures 15–17: change the fields, then <code>notifyListeners()</code>. Provider runs <code>create</code> the first time a widget asks for the provider (here: when the products page opens), so that is when loading starts.</p><p><code>FutureBuilder</code> is fine for one screen; a Provider is better when several screens need the same data, or the data should stay loaded when you leave the page.</p></aside>
+</section>
+
+<!-- 12 · Version 2 page -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Version 2 · Provider</p>
+      <h2 class="title">Version 2: the page, with pull-to-refresh</h2>
+    </header>
+    <div class="body" style="grid-template-columns: 1fr auto; gap: 2.4cqw; align-items:start;">
+      <div class="side">
+        <div class="term code">
+          <div class="term__bar"><i></i><i></i><i></i><span>lib/pages/products_provider_page.dart</span><span class="grow"></span><span>StatelessWidget</span></div>
+<pre class="hl" data-hl="1,3,12-15">final provider = context.watch&lt;ProductsProvider&gt;();
+
+if (provider.isLoading &amp;&amp; provider.products.isEmpty) {
+  return const Center(child: CircularProgressIndicator());
+}
+if (provider.error != null) {
+  return ErrorView(message: provider.error!, onRetry: provider.loadProducts);
+}
+if (provider.products.isEmpty) {
+  return EmptyView(message: 'No products found', onRetry: provider.loadProducts);
+}
+return RefreshIndicator(
+  onRefresh: provider.loadProducts,
+  child: ListView.builder(/* same as version 1 */),
+);</pre>
+        </div>
+        <div class="stagger" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1.2cqw;">
+          <div class="callout callout--info"><svg class="ico"><use href="#i-layers"/></svg><div>Same four states; the data now comes from the provider.</div></div>
+          <div class="callout callout--ok"><svg class="ico"><use href="#i-refresh"/></svg><div><b><code>RefreshIndicator</code></b>: pull the list down → it calls <code>onRefresh</code> and spins until that <code>Future</code> finishes.</div></div>
+          <div class="callout callout--info"><svg class="ico"><use href="#i-info"/></svg><div>During a refresh <code>isLoading</code> is true, but the old list stays on screen.</div></div>
+        </div>
+      </div>
+      <div class="ph-col">
+        <div class="ph ph--teal" style="--pw:14cqw;">
+          <div class="ph__scr"><div class="ph__island"></div>
+            <div class="appbar"><svg class="ico ico-m"><use href="#i-arrow-left"/></svg><span>Products (Provider)</span></div>
+            <div class="pull" style="top:5.4em;"><div class="spin"></div></div>
+            <div class="ptile" style="margin-top:3.2em;"><span class="pimg pimg--tube" style="--bgc:#FCE4EC; --ink:#212121; --cap:#EC407A;"></span><div><b>Essence Mascara Lash Princess</b><small>$9.99</small></div></div>
+            <div class="ptile"><span class="pimg pimg--pan" style="--bgc:#EFEBE9;"></span><div><b>Eyeshadow Palette with Mirror</b><small>$19.99</small></div></div>
+            <div class="ptile"><span class="pimg pimg--jar" style="--bgc:#FFF3E0; --ink:#E8B98F; --cap:#6D4C41;"></span><div><b>Powder Canister</b><small>$14.99</small></div></div>
+            <div class="ptile"><span class="pimg pimg--tube" style="--bgc:#FFEBEE; --ink:#C9A227; --cap:#C62828;"></span><div><b>Red Lipstick</b><small>$12.99</small></div></div>
+            <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#FFEBEE; --ink:#D32F2F; --cap:#212121;"></span><div><b>Red Nail Polish</b><small>$8.99</small></div></div>
+            <div class="ptile"><span class="pimg pimg--bottle" style="--bgc:#ECEFF1; --ink:#B0BEC5; --cap:#37474F;"></span><div><b>Calvin Klein CK One</b><small>$49.99</small></div></div>
+          </div>
+        </div>
+        <p class="ph-cap">pull down → <code>onRefresh</code></p>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p><code>onRefresh</code> needs a function that returns a <code>Future</code>, and <code>loadProducts</code> is exactly that. We pass <code>provider.loadProducts</code> without <code>()</code>: we give the function, we don't call it now. The page is a <code>StatelessWidget</code>: the provider holds the state.</p></aside>
+</section>
+
+<!-- 13 · When the internet fails -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Friendly errors</p>
+      <h2 class="title">When the internet fails</h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.3fr .7fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/services/product_api.dart</span><span class="grow"></span><span>fetchProducts() · final version</span></div>
+<pre class="hl" data-groups="4,6-7:g1;8-9:g2">try {
+  final response = await http
+      .get(Uri.parse(_url))
+      .timeout(const Duration(seconds: 10));
+  // ... check statusCode, decode, map to products (as before)
+} on TimeoutException {
+  throw ApiException('The server is too slow. Please try again.');
+} on SocketException {
+  throw ApiException('No internet connection. Check your Wi-Fi or data.');
+} on http.ClientException {
+  throw ApiException('Could not reach the server. Please try again.');
+}</pre>
+      </div>
+      <div class="explain">
+        <div class="legend-groups stagger">
+          <div class="lg" style="--c:#13B9FD;"><span class="n">1</span><b><code>.timeout(...)</code></b><span>Give up after 10 seconds (<code>TimeoutException</code>, from <code>dart:async</code>).</span></div>
+          <div class="lg" style="--c:#FFC857;"><span class="n">2</span><b><code>SocketException</code></b><span>From <code>dart:io</code>: no network. With <code>http</code> 1.6 it arrives as a <code>ClientException</code> that is <i>also</i> a <code>SocketException</code>, so this line must come <strong>first</strong>.</span></div>
+        </div>
+        <div class="callout callout--info"><svg class="ico"><use href="#i-target"/></svg><div><b><code>on Type</code>:</b> catch only that kind of error.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Live: turn on airplane mode and tap <b>Try again</b> → "No internet connection…". Then set the timeout to 2 seconds and the URL to <code>https://dummyjson.com/products?delay=4000</code> → "The server is too slow…". On the web there is no <code>SocketException</code>; the <code>ClientException</code> line catches it.</p></aside>
+</section>
+
+<!-- 14 · POST -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Sending data</p>
+      <h2 class="title">Sending data: a POST request</h2>
+    </header>
+    <div class="body walk" style="grid-template-columns: 1.3fr .7fr;">
+      <div class="term code">
+        <div class="term__bar"><i></i><i></i><i></i><span>lib/services/post_api.dart</span><span class="grow"></span><span>PostApi</span></div>
+<pre class="hl" data-hl="2,4-9,11">static Future&lt;Map&lt;String, dynamic&gt;&gt; createPost(String title) async {
+  final response = await http.post(
+    Uri.parse(_url), // https://jsonplaceholder.typicode.com/posts
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'title': title,
+      'body': 'Sent from my Flutter app',
+      'userId': 1,
+    }),
+  );
+  if (response.statusCode != 201) {
+    throw ApiException('Could not send the post (${response.statusCode}).');
+  }
+  return jsonDecode(response.body) as Map&lt;String, dynamic&gt;;
+}</pre>
+      </div>
+      <div class="explain stagger">
+        <div class="defs">
+          <div class="def"><code>headers</code><span>Tell the server "my body is JSON".</span></div>
+          <div class="def"><code>jsonEncode</code><span>Dart map → JSON text (the opposite of <code>jsonDecode</code>).</span></div>
+        </div>
+        <div class="term code code--sm code--nonum">
+          <div class="term__bar"><i></i><i></i><i></i><span>The answer</span><span class="grow"></span><span class="t-ok">201 Created</span></div>
+<pre class="hl">{
+  "title": "My first post",
+  "body": "Sent from my Flutter app",
+  "userId": 1,
+  "id": 101
+}</pre>
+        </div>
+        <div class="callout callout--ok"><svg class="ico"><use href="#i-check-circle"/></svg><div>Success for a POST is <b>201 Created</b>; the answer is the new post with <code>"id": 101</code>.</div></div>
+        <div class="callout callout--warn"><svg class="ico"><use href="#i-alert"/></svg><div>JSONPlaceholder is <b>fake</b>: it answers 201 but saves nothing (<code>GET /posts/101</code> → 404).</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Run the <b>Send a post</b> page. Then open <code>https://jsonplaceholder.typicode.com/posts/101</code> in the browser: <code>{}</code> with status 404. Real APIs (and Firebase, in the next lectures) really save the data.</p></aside>
+</section>
+
+<!-- 15 · Free practice APIs -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Practice</p>
+      <h2 class="title">Free practice APIs (no key needed)</h2>
+    </header>
+    <div class="body" style="grid-template-rows: auto auto; align-content:start; gap:1.4cqw;">
+      <table class="tbl" style="font-size:1.18cqw;">
+        <thead><tr><th><svg class="ico"><use href="#i-globe"/></svg>API</th><th><svg class="ico"><use href="#i-search"/></svg>URL to try</th><th><svg class="ico"><use href="#i-package"/></svg>What you get</th><th><svg class="ico"><use href="#i-lock"/></svg>Key needed?</th></tr></thead>
+        <tbody>
+          <tr><td style="width:17%;">JSONPlaceholder</td><td><code>jsonplaceholder.typicode.com/posts</code>, <code>/users</code>, <code>/todos</code></td><td>Lists of posts, users, todos; fake POST, PUT, PATCH, DELETE</td><td><span class="same"><svg class="ico"><use href="#i-check"/></svg>none</span></td></tr>
+          <tr><td>DummyJSON</td><td><code>dummyjson.com/products</code>, <code>/quotes/random</code>, <code>/recipes</code></td><td>Products with images, quotes, recipes; <code>?limit=</code>, <code>?delay=</code>, <code>/search?q=</code></td><td><span class="same"><svg class="ico"><use href="#i-check"/></svg>none</span></td></tr>
+          <tr><td>CountriesNow + flagcdn</td><td><code>countriesnow.space/api/v0.1/countries/capital</code>, <code>flagcdn.com/w80/ly.png</code></td><td>Country names, capitals, ISO codes; flag images (lowercase ISO code)</td><td><span class="same"><svg class="ico"><use href="#i-check"/></svg>none</span></td></tr>
+          <tr><td>Open-Meteo</td><td><code>api.open-meteo.com/v1/forecast</code><br><code>?latitude=32.8872&amp;longitude=13.1913</code><br><code>&amp;current=temperature_2m,wind_speed_10m</code></td><td>Current weather for any latitude/longitude (Tripoli here)</td><td><span class="same"><svg class="ico"><use href="#i-check"/></svg>none</span></td></tr>
+        </tbody>
+      </table>
+      <div class="row-bottom stagger">
+        <div class="callout callout--info" style="font-size:1.25cqw;"><svg class="ico"><use href="#i-search"/></svg><div>Always open the URL in the browser first: <b>List or Map?</b> Which keys?</div></div>
+        <div class="callout callout--warn" style="font-size:1.25cqw;"><svg class="ico"><use href="#i-alert"/></svg><div>APIs change: <b>REST Countries</b> <code>v3.1</code> was switched off in 2026; its <code>v5</code> needs an API key.</div></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Show the <b>Free practice APIs</b> page: one tap per API. Every URL here was checked on 2 November 2026; the full samples and fetch code are in the "Free practice APIs" section of the plan. Many online tutorials still use <code>restcountries.com/v3.1/...</code>: today that URL redirects to a "this API version has been deprecated" message.</p><p>Open-Meteo: the forecast endpoint could not be captured on 2 November 2026 (every check answered <code>503 Service Unavailable</code>, "The service is overloaded"), so the response shape in the plan is the one from the Open-Meteo documentation. Open the forecast URL in the browser before class and paste the real answer.</p></aside>
+</section>
+
+<!-- 16 · Meme break -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Meme break</p>
+      <h2 class="title">Map keys or a model class?</h2>
+    </header>
+    <div class="body meme-slide">
+      <figure class="meme meme--drake" style="--mw:36cqw;"><img src="https://i.imgflip.com/30b1gx.jpg" alt="Drake meme: map keys versus a model class">
+        <span class="cap cap--ink c1"><span><code>json['tittle']</code> everywhere (a typo you only find when the app crashes)</span></span>
+        <span class="cap cap--ink c2"><span><code>post.title</code> (a model class: the editor catches the typo)</span></span></figure>
+      <div class="meme-side stagger">
+        <div class="say"><p>Why does Drake say no to the first one? When do you find out about the typo in each case?</p></div>
+        <div class="callout callout--ok"><svg class="ico"><use href="#i-check-circle"/></svg><div>A wrong field name on a model is a red line in VS Code before you even run. That's why we write <code>fromJson</code> once.</div></div>
+        <p class="meme-link">Make your own: <a href="https://imgflip.com/memegenerator/181913649" target="_blank" rel="noopener">imgflip meme generator</a> · <a href="https://knowyourmeme.com/memes/drakeposting" target="_blank" rel="noopener">about this meme</a></p>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>A wrong map key returns null and fails at runtime ("type 'Null' is not a subtype of type 'String'"); a wrong field name on a model is a red line in VS Code before you even run. That's why we write fromJson once. (With an explicit <code>as String</code>, Dart 3.13 adds "in type cast" at the end of the same message.)</p></aside>
+</section>
+
+<!-- 17 · Summary + Questions -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Wrap-up</p>
+      <h2 class="title">Summary + Questions</h2>
+    </header>
+    <div class="body wrap">
+      <article class="card card--hl">
+        <h3>Today you learned</h3>
+        <ul class="checklist stagger" style="gap:1.6cqw; margin-top:1.6cqw;">
+          <li><span>A <b>model class</b> + <code>fromJson</code> turns maps into typed objects; JSON keys live in one place.</span></li>
+          <li><span>A <b>service class</b> does the network work and throws clear errors.</span></li>
+          <li><span>Every data screen has four states: <b>loading, success, empty, error</b> (with retry).</span></li>
+          <li><span><code>FutureBuilder</code> for one screen; a <b>Provider</b> when the data is shared or should stay loaded.</span></li>
+          <li><span><code>RefreshIndicator</code> for pull-to-refresh; <code>.timeout</code> + <code style="white-space:nowrap;">on ...Exception</code> for friendly errors; <code>http.post</code> + <code>jsonEncode</code> to send data.</span></li>
+        </ul>
+      </article>
+      <div class="side" style="align-content:center; justify-items:center; gap:1.6cqw;">
+        <div class="itile" style="width:7cqw; height:7cqw; font-size:3.6cqw; border-radius:1.6cqw;"><svg class="ico"><use href="#i-users"/></svg></div>
+        <div class="qa__big grad-text">Questions?</div>
+        <p class="muted" style="font-size:1.3cqw;">Homework is on the next slide.</p>
+      </div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Go back to slide 2 and tick the goals. Ask one student to name the four states without looking.</p></aside>
+</section>
+
+<!-- 18 · Homework -->
+<section class="slide">
+  <div class="canvas"><div class="frame">
+    <header class="head">
+      <p class="kicker">Practice at home</p>
+      <h2 class="title">Homework</h2>
+    </header>
+    <div class="body" style="grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto auto; gap:1.4cqw; align-content:start;">
+      <article class="card tool"><span class="tool__n">01</span><span class="itile"><svg class="ico"><use href="#i-star"/></svg></span><h3>Show the rating and the brand in each tile.</h3><span class="tool__src">'\$9.99 · ★ 2.6' + trailing: brand</span></article>
+      <article class="card tool"><span class="tool__n">02</span><span class="itile"><svg class="ico"><use href="#i-quote"/></svg></span><h3>A Quote of the day card with a <b>New quote</b> button.</h3><span class="tool__src">dummyjson.com/quotes/random</span></article>
+      <article class="card tool"><span class="tool__n">03</span><span class="itile"><svg class="ico"><use href="#i-utensils"/></svg></span><h3>A Recipes list with images (models + four states).</h3><span class="tool__src">dummyjson.com/recipes</span></article>
+      <article class="card tool"><span class="tool__n">04</span><span class="itile"><svg class="ico"><use href="#i-flag"/></svg></span><h3>Countries with flags from CountriesNow + flagcdn.</h3><span class="tool__src">countriesnow.space · flagcdn.com</span></article>
+      <article class="card tool"><span class="tool__n">05</span><span class="itile"><svg class="ico"><use href="#i-sun"/></svg></span><h3>Tripoli weather card from Open-Meteo.</h3><span class="tool__src">api.open-meteo.com/v1/forecast</span></article>
+      <article class="card tool"><span class="tool__n">06</span><span class="itile"><svg class="ico"><use href="#i-search"/></svg></span><h3><span class="badge badge--warm" style="vertical-align:.2em; margin-right:.4cqw;">Bonus</span>Search products with <code>/products/search?q=</code>.</h3><span class="tool__src">ProductApi.searchProducts(query)</span></article>
+      <div class="callout callout--info" style="grid-column: 1 / -1; font-size:1.3cqw;"><svg class="ico"><use href="#i-bulb"/></svg><div>Every exercise uses the same three steps: <b>open the URL in the browser</b>, <b>write the model</b>, then <b>the four states</b>.</div></div>
+    </div>
+    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+  </div></div>
+  <aside class="notes"><p>Full descriptions are in the homework section of the plan. Every exercise uses the same three steps: open the URL in the browser, write the model, then the four states.</p></aside>
+</section>
+
+</main>
+
+<div class="notes-panel" hidden>
+  <h4 class="np-title">Speaker notes</h4>
+  <div class="np-body"></div>
+</div>
+<div class="hint" aria-hidden="true"><kbd>←</kbd> <kbd>→</kbd> navigate · <kbd>F</kbd> fullscreen · <kbd>N</kbd> notes · <kbd>T</kbd> theme</div>
+
+<script src="js/deck.js"></script>
+</body>
+</html>
