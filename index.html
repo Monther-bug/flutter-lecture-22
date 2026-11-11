@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lecture 19 · Models, Loading &amp; Error States</title>
-  <meta name="description" content="Mobile App Development with Flutter, Lecture 19: Turn JSON into Dart model classes, keep network code in a service class, show loading, success, empty and error states with retry, and practise with free APIs.">
+  <title>Lecture 22 · Models, Loading &amp; Error States</title>
+  <meta name="description" content="Mobile App Development with Flutter, Lecture 22: Turn JSON into Dart model classes, keep network code in a service class, show loading, success, empty and error states with retry, and practise with free APIs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Sora:wght@600;700&amp;display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@
 <section class="slide">
   <div class="canvas"><div class="frame frame--title">
     <div class="stagger">
-      <p class="kicker">Lecture 19 · Mobile App Development</p>
+      <p class="kicker">Lecture 22 · Mobile App Development</p>
       <h1 class="hero" style="font-size:3.7cqw;">APIs 2: Models,<br><span class="grad-text">Loading &amp; Error States</span>,<br>Practice APIs</h1>
       <p class="lead lead--hero">From raw JSON to a real shop screen.</p>
       <div class="chips">
@@ -156,7 +156,7 @@
       </div>
       <div class="callout callout--ok goal"><svg class="ico"><use href="#i-bag"/></svg><div><b>Live demo:</b> a small <b>shop</b>: products from DummyJSON (image, title, price), a details screen, a spinner, an "empty" message, a friendly error with <b>Try again</b>, and pull-to-refresh.</div></div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Read the goals aloud. We tick them off on the summary slide.</p></aside>
 </section>
@@ -193,9 +193,9 @@
         <div class="callout callout--info" style="font-size:1.45cqw; padding:1.3cqw 1.5cqw;"><svg class="ico"><use href="#i-target"/></svg><div><b>One place:</b> the JSON keys are written once, in <code>fromJson</code>.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
-  <aside class="notes"><p>Open the Lecture 18 Posts page and change <code>post['title']</code> to <code>post['titel']</code>: no warning, then a red screen at runtime. Then type <code>product.</code> in today's code and show the autocomplete list.</p></aside>
+  <aside class="notes"><p>Open the Lecture 15 Posts page and change <code>post['title']</code> to <code>post['titel']</code>: no warning, then a red screen at runtime. Then type <code>product.</code> in today's code and show the autocomplete list.</p></aside>
 </section>
 
 <!-- 04 · A model class -->
@@ -244,7 +244,7 @@
         <div class="callout callout--info"><svg class="ico"><use href="#i-bulb"/></svg><div>The API sends many more keys. A model only keeps what the app shows.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Open <code>https://dummyjson.com/products/1</code> in the browser and pick the keys we need. There are many more (<code>reviews</code>, <code>dimensions</code>, …); a model only keeps what the app shows. The full class with <code>description</code> and <code>rating</code> is in the complete example.</p></aside>
 </section>
@@ -283,7 +283,7 @@
         <div class="callout callout--warn"><svg class="ico"><use href="#i-alert"/></svg><div>Recipe 11 at DummyJSON has <code>"rating": 5</code>. <code>as double</code> crashes there; <code>as num</code> works.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Real example: recipe 11 at DummyJSON ("Chicken Biryani") has <code>"rating": 5</code>, a whole number. <code>json['rating'] as double</code> crashes there with "type 'int' is not a subtype of type 'double' in type cast"; <code>(json['rating'] as num).toDouble()</code> works for all of them.</p></aside>
 </section>
@@ -329,7 +329,7 @@
         <div class="callout callout--info"><svg class="ico"><use href="#i-alert"/></svg><div><b><code>ApiException</code>:</b> our own small error class with a message for the user (complete example).</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>This is the first version; slide 13 adds timeouts and "no internet". Pages should only ask "give me products"; <i>how</i> to get them lives here. If the API changes, we fix one file.</p></aside>
 </section>
@@ -402,7 +402,7 @@
         <div class="callout callout--ok" style="font-size:1.3cqw;"><svg class="ico"><use href="#i-check-circle"/></svg><div>Check them in this order: <b>loading → error → empty → success</b>.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Ask: what does a white screen tell the user? Nothing. Is it loading, broken, or empty? Each state answers that question. We show them live by changing the URL: <code>?delay=3000</code> (slow), <code>/products/search?q=zzzz</code> (empty), <code>/productz</code> (error 404).</p></aside>
 </section>
@@ -462,9 +462,9 @@
         <div class="callout callout--info"><svg class="ico"><use href="#i-refresh"/></svg><div>A new Future → <code>FutureBuilder</code> starts again at <code>waiting</code> → the spinner shows.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
-  <aside class="notes"><p>Same idea as Lecture 18 (start the Future in <code>initState</code>, never in <code>build</code>), plus one method to start again.</p></aside>
+  <aside class="notes"><p>Same idea as Lecture 15 (start the Future in <code>initState</code>, never in <code>build</code>), plus one method to start again.</p></aside>
 </section>
 
 <!-- 09 · Version 1: the builder -->
@@ -505,7 +505,7 @@ return ListView.builder(
         <div class="callout callout--ok"><svg class="ico"><use href="#i-check-circle"/></svg><div><code>snapshot.data</code> is now a <code>List&lt;Product&gt;</code>, not maps.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p><code>snapshot.error</code> is our <code>ApiException</code>, so <code>'${snapshot.error}'</code> is already a friendly sentence. <code>?? []</code> means "if there is no data, use an empty list".</p></aside>
 </section>
@@ -572,7 +572,7 @@ return ListView.builder(
         </div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p><code>Image.network</code> is from Lecture 6; DummyJSON images are <code>.webp</code>, which Flutter shows on every platform. <code>ProductDetailsPage({required this.product})</code> is the Lecture 9 "pass data through the constructor" pattern.</p><p>The details page shows a big image, the title, the price, the star rating, the brand (or "No brand") and the description.</p></aside>
 </section>
@@ -615,9 +615,9 @@ return ListView.builder(
         <div class="callout callout--info"><svg class="ico"><use href="#i-info"/></svg><div>The <code>..</code> means "create it, call <code>loadProducts()</code>, and give back the provider".</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
-  <aside class="notes"><p>This is the <code>ChangeNotifier</code> from Lectures 15–17: change the fields, then <code>notifyListeners()</code>. Provider runs <code>create</code> the first time a widget asks for the provider (here: when the products page opens), so that is when loading starts.</p><p><code>FutureBuilder</code> is fine for one screen; a Provider is better when several screens need the same data, or the data should stay loaded when you leave the page.</p></aside>
+  <aside class="notes"><p>This is the <code>ChangeNotifier</code> from Lectures 13, 14 and 21: change the fields, then <code>notifyListeners()</code>. Provider runs <code>create</code> the first time a widget asks for the provider (here: when the products page opens), so that is when loading starts.</p><p><code>FutureBuilder</code> is fine for one screen; a Provider is better when several screens need the same data, or the data should stay loaded when you leave the page.</p></aside>
 </section>
 
 <!-- 12 · Version 2 page -->
@@ -669,7 +669,7 @@ return RefreshIndicator(
         <p class="ph-cap">pull down → <code>onRefresh</code></p>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p><code>onRefresh</code> needs a function that returns a <code>Future</code>, and <code>loadProducts</code> is exactly that. We pass <code>provider.loadProducts</code> without <code>()</code>: we give the function, we don't call it now. The page is a <code>StatelessWidget</code>: the provider holds the state.</p></aside>
 </section>
@@ -705,7 +705,7 @@ return RefreshIndicator(
         <div class="callout callout--info"><svg class="ico"><use href="#i-target"/></svg><div><b><code>on Type</code>:</b> catch only that kind of error.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Live: turn on airplane mode and tap <b>Try again</b> → "No internet connection…". Then set the timeout to 2 seconds and the URL to <code>https://dummyjson.com/products?delay=4000</code> → "The server is too slow…". On the web there is no <code>SocketException</code>; the <code>ClientException</code> line catches it.</p></aside>
 </section>
@@ -754,9 +754,9 @@ return RefreshIndicator(
         <div class="callout callout--warn"><svg class="ico"><use href="#i-alert"/></svg><div>JSONPlaceholder is <b>fake</b>: it answers 201 but saves nothing (<code>GET /posts/101</code> → 404).</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
-  <aside class="notes"><p>Run the <b>Send a post</b> page. Then open <code>https://jsonplaceholder.typicode.com/posts/101</code> in the browser: <code>{}</code> with status 404. Real APIs (and Firebase, in the next lectures) really save the data.</p></aside>
+  <aside class="notes"><p>Run the <b>Send a post</b> page. Then open <code>https://jsonplaceholder.typicode.com/posts/101</code> in the browser: <code>{}</code> with status 404. Real APIs (and Firebase, in Lectures 16–18) really save the data.</p></aside>
 </section>
 
 <!-- 15 · Free practice APIs -->
@@ -781,7 +781,7 @@ return RefreshIndicator(
         <div class="callout callout--warn" style="font-size:1.25cqw;"><svg class="ico"><use href="#i-alert"/></svg><div>APIs change: <b>REST Countries</b> <code>v3.1</code> was switched off in 2026; its <code>v5</code> needs an API key.</div></div>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Show the <b>Free practice APIs</b> page: one tap per API. Every URL here was checked on 2 November 2026; the full samples and fetch code are in the "Free practice APIs" section of the plan. Many online tutorials still use <code>restcountries.com/v3.1/...</code>: today that URL redirects to a "this API version has been deprecated" message.</p><p>Open-Meteo: the forecast endpoint could not be captured on 2 November 2026 (every check answered <code>503 Service Unavailable</code>, "The service is overloaded"), so the response shape in the plan is the one from the Open-Meteo documentation. Open the forecast URL in the browser before class and paste the real answer.</p></aside>
 </section>
@@ -803,7 +803,7 @@ return RefreshIndicator(
         <p class="meme-link">Make your own: <a href="https://imgflip.com/memegenerator/181913649" target="_blank" rel="noopener">imgflip meme generator</a> · <a href="https://knowyourmeme.com/memes/drakeposting" target="_blank" rel="noopener">about this meme</a></p>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>A wrong map key returns null and fails at runtime ("type 'Null' is not a subtype of type 'String'"); a wrong field name on a model is a red line in VS Code before you even run. That's why we write fromJson once. (With an explicit <code>as String</code>, Dart 3.13 adds "in type cast" at the end of the same message.)</p></aside>
 </section>
@@ -832,7 +832,7 @@ return RefreshIndicator(
         <p class="muted" style="font-size:1.3cqw;">Homework is on the next slide.</p>
       </div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Go back to slide 2 and tick the goals. Ask one student to name the four states without looking.</p></aside>
 </section>
@@ -853,7 +853,7 @@ return RefreshIndicator(
       <article class="card tool"><span class="tool__n">06</span><span class="itile"><svg class="ico"><use href="#i-search"/></svg></span><h3><span class="badge badge--warm" style="vertical-align:.2em; margin-right:.4cqw;">Bonus</span>Search products with <code>/products/search?q=</code>.</h3><span class="tool__src">ProductApi.searchProducts(query)</span></article>
       <div class="callout callout--info" style="grid-column: 1 / -1; font-size:1.3cqw;"><svg class="ico"><use href="#i-bulb"/></svg><div>Every exercise uses the same three steps: <b>open the URL in the browser</b>, <b>write the model</b>, then <b>the four states</b>.</div></div>
     </div>
-    <footer class="foot"><span>Mobile App Development · Lecture 19</span><span class="num"></span></footer>
+    <footer class="foot"><span>Mobile App Development · Lecture 22</span><span class="num"></span></footer>
   </div></div>
   <aside class="notes"><p>Full descriptions are in the homework section of the plan. Every exercise uses the same three steps: open the URL in the browser, write the model, then the four states.</p></aside>
 </section>
